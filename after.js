@@ -30,60 +30,130 @@
     });
   }
   
+  async function fillForm(form) {
+    const inputData = await loadData();
+    console.log('Input Data', inputData);
+    
+    const inputs = form.querySelectorAll('input, textarea, select');
+    
+    for (const input of inputs) {
+      await fillInput(input, inputData);
+    }
+  }
+
+  async function fillInput(input, inputData) {
+
+    console.log("Fill Input", input)
+    const identifier = findIdentifier(input);
+    const keys = Object.keys(inputData);
+    const matchingKey = keys.find(key => identifier.includes(key.toLowerCase()));
+  
+    if (matchingKey) {
+      input.value = inputData[matchingKey];
+    } else {
+      await fillUnknownField(input, identifier, inputData);
+    }
+  }
+
+  function findIdentifier(input) {
+    let identifier = input.name || input.placeholder || '';
+    const label = document.querySelector(`label[for="${input.id}"]`);
+  
+    if (label) {
+      identifier = label.textContent;
+    }  
+    return identifier.toLowerCase();
+  }
+  
+async function fillUnknownField(input, identifier, inputData) {
+  if (input.type !== 'submit' && input.type !== 'button') {
+    if (inputData['prompt']) {
+      const content = await webdata();
+      const prompt = `What should I fill in for the field with label "${identifier}" on educator's website? ${inputData['prompt']} ${content}`;
+      const gptResponse = await fetchGPT(prompt);
+      input.value = gptResponse;
+    } else {
+      input.value = 'magic';
+    }
+  }
+}
+
   
   async function generateFormData() {
-    let data = await loadData();
-  
-    const lines = data.split('\n');
-    const inputData = {};
-  
-    // Parse lines from data.txt into inputData object
-    lines.forEach(line => {
-        const [key, value] = line.split(': ');
-        inputData[key.toLowerCase()] = value;
-    });
   
     // Find the first form on the page
     const form = document.querySelector('form');
   
+    // Main part
     if (form) {
-        // Find all input fields within the form
-        const inputs = form.querySelectorAll('input, textarea, select');
-  
-        // Loop through each input field and fill it
-        for (const input of inputs) {
-            let identifier = input.name.toLowerCase() || input.placeholder.toLowerCase();
-            let label = document.querySelector(`label[for="${input.id}"]`);
-  
-            if (label) {
-                identifier = label.textContent.toLowerCase();
-            }
-  
-            const keys = Object.keys(inputData);
-            const matchingKey = keys.find(key => identifier.includes(key));
-  
-            if (matchingKey) {
-                input.value = inputData[matchingKey];
-            } else if (input.type !== 'submit' && input.type !== 'button') {
-                if (inputData['goal']) {
-                    content = await webdata();
-                    const prompt = `What should I fill in for the field with label "${identifier}" on educator's website? ${inputData['goal']} ${content}`;
-                    console.log(`Prompt: ${prompt}`);
-                    const gptResponse = await fetchGPT(prompt);
-                    input.value = gptResponse;
-                }
-                else {
-                    input.value = 'magic';
-                }
-            }
-        }
+      fillForm(form).then(() => {
+        console.log('Form Filled');
+      }).catch((err) => {
+        console.log('Error Filling Form:', err);
+      });
     }
+
+    // if (form) {
+
+    //   let inputData = await loadData();
+    //   console.log('Input Data', inputData);
+    //     // Find all input fields within the form
+    //     const inputs = form.querySelectorAll('input, textarea, select');
+  
+    //     // Loop through each input field and fill it
+    //     for (const input of inputs) {
+    //         let identifier = input.name.toLowerCase() || input.placeholder.toLowerCase();
+    //         let label = document.querySelector(`label[for="${input.id}"]`);
+  
+    //         if (label) {
+    //             identifier = label.textContent.toLowerCase();
+    //         }
+  
+    //         const keys = Object.keys(inputData);
+    //         const matchingKey = keys.find(key => identifier.includes(key));
+  
+    //         if (matchingKey) {
+    //             input.value = inputData[matchingKey];
+    //         } else if (input.type !== 'submit' && input.type !== 'button') {
+    //             if (inputData['prompt']) {
+    //                 content = await webdata();
+    //                 const prompt = `What should I fill in for the field with label "${identifier}" on educator's website? ${inputData['prompt']} ${content}`;
+    //                 console.log(`Prompt: ${prompt}`);
+    //                 const gptResponse = await fetchGPT(prompt);
+    //                 input.value = gptResponse;
+    //             }
+    //             else {
+    //                 input.value = 'magic';
+    //             }
+    //         }
+    //     }
+    // }
   }
   
   async function loadData() {
-    let response = await fetch(chrome.runtime.getURL('data.txt'));
-    let data = response.text();
-  
+
+    // let response = await fetch(chrome.runtime.getURL('data.txt'));
+    // let data = response.text();
+
+    let data = {};
+    // Load saved data from local storage
+    chrome.storage.local.get([
+      'apiKey', 'name', 'email', 'phone', 'prompt', 
+      'enableHomePageScraping', 'homePageWordCount', 
+      'enableCurrentPageScraping', 'currentPageWordCount'
+    ], (result) => {
+      if (result.apiKey) data['apiKey'] = result.apiKey;
+      if (result.name) data['name'] = result.name;
+      if (result.email) data['email'] = result.email;
+      if (result.phone) data['phone'] = result.phone;
+      if (result.prompt) data['prompt']  = result.prompt;
+      if (result.enableHomePageScraping) data['enableHomePageScraping']  = true;
+      if (result.homePageWordCount) data['homePageWordCount']  = result.homePageWordCount;
+      if (result.enableCurrentPageScraping) data['enableCurrentPageScraping']  = true;
+      if (result.currentPageWordCount) data['currentPageWordCount'] = result.currentPageWordCount;
+    });
+
+
     return data;
   }
   

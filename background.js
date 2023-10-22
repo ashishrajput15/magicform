@@ -1,15 +1,20 @@
 console.log("[magicform] executing background.js")
 
-// event to run execute.js content when extension's button is clicked
-chrome.action.onClicked.addListener(execScript);
 
-async function execScript() {
-  const tabId = await getTabId();
-  chrome.scripting.executeScript({
-    target: {tabId: tabId},
-    files: ['execute.js']
-  });
-}
+chrome.action.onClicked.addListener((tab) => {
+  chrome.tabs.create({ url: 'options.html' });
+});
+
+// event to run execute.js content when extension's button is clicked
+// chrome.action.onClicked.addListener(execScript);
+
+// async function execScript() {
+//   const tabId = await getTabId();
+//   chrome.scripting.executeScript({
+//     target: {tabId: tabId},
+//     files: ['execute.js']
+//   });
+// }
 
 async function getTabId() {
   const tabs = await chrome.tabs.query({active: true, currentWindow: true});
@@ -30,5 +35,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse(storedSentences);
   }
 });
+
 
 console.log("[magicform] background.js executed")
