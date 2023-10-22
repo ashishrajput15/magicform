@@ -1,0 +1,43 @@
+{
+  "name": "Magic Form",
+  "description": "Magic Form filler using GPT",
+  "version": "2.0.0",
+  "manifest_version": 3,
+  "action": {
+    "default_title": "Magic Form filler using GPT"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "tabs",
+    "scripting",
+    "activeTab",
+    "storage",
+    "https://api.openai.com/"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*",
+    "https://api.openai.com/"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-script.js"]
+    }
+  ],
+  
+    "web_accessible_resources": [
+      {
+        "resources": ["data.txt"],
+        "matches": ["<all_urls>"]
+      }
+    ]
+  
+}

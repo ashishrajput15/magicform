@@ -1,0 +1,29 @@
+It is giving me message lke this.
+Super 30Personal CoachingJoin usHire from usContact us Join Our Super 30 Squad And be MAANG ready in 4 months Join Now 98 LPA Highest CTC 150+ Top coaches 27 LPA Average CTC 350+ Company Tie Ups Introducing Super 30 We are selecting 30 engineers.
+
+Our Success Coaches Our Coaches Set Us Apart Drishti Mamtani Mehul Lakhanpal Harshita Kumari Arvindh Kumar Khushboo Kumari Abhishek Amrutia Pratik Kapasi Hari Ram Sai Sandeep Jitendra Ojha Anubhav Sinha Aditya Karnam Drishti Mamtani Mehul Lakhanpal Harshita Kumari Arvindh Kumar Khushboo Kumari Abhishek Amrutia Pratik Kapasi Hari Ram Sai Sandeep Jitendra Ojha Anubhav Sinha Aditya Karnam Explore coaches Contact Us Ping Us On WhatsApp Or Send in your queries at team@heycoach.
+
+in QUICK LINKS About Us Our Coaches Careers Contact Us Join As Success Coach Book A Meeting PRODUCTS Super 30 Personal Coaching LEGAL Privacy Policy Terms & Conditions CONTACT +91-9353912654 team@heycoach.
+
+I only want to see like this
+Email: team@heycoach
+
+
+"content_scripts": [
+    {
+      "run_at": "document_start",
+      "js": ["before.js"],
+      "matches": [
+        "https://*/*",
+        "http://*/*"
+      ]
+    },
+    {
+      "run_at": "document_idle",
+      "js": ["after.js"],
+      "matches": [
+        "https://*/*",
+        "http://*/*"
+      ]
+    }
+  ],
