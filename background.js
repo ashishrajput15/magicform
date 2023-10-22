@@ -7,10 +7,6 @@ async function execScript() {
     target: {tabId: tabId},
     files: ['execute.js']
   });
-  chrome.scripting.executeScript({
-    target: {tabId: tabId},
-    files: ['after.js']
-  });
 }
 
 async function getTabId() {
@@ -32,3 +28,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse(storedSentences);
   }
 });
+
+console.log("[magicform] background.js executed")
