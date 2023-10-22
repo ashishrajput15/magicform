@@ -64,7 +64,7 @@ async function loadData() {
 
 
 async function fetchGPT(prompt) {
-    const apiKey = "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";
+    const apiKey = "sk-IBzSiHyV7VBvnnG00zh8T3BlbkFJdhIuTsWPWhXJSht1yfl";
     const apiURL = "https://api.openai.com/v1/chat/completions";
     const headers = {
         "Authorization": `Bearer ${apiKey}`,
