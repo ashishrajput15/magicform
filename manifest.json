@@ -8,7 +8,7 @@
   },
   "icons": {
     "16": "icon.png",
-    "48": "icon.png",
+    "48": "icon48.png",
     "128": "icon.png"
   },
   "background": {
@@ -27,16 +27,9 @@
     "https://api.openai.com/"
   ],
   "content_scripts": [
+    
     {
-      "run_at": "document_start",
-      "js": ["before.js"],
-      "matches": [
-        "https://*/*",
-        "http://*/*"
-      ]
-    },
-    {
-      "run_at": "document_idle",
+      "run_at": "document_end",
       "js": ["after.js"],
       "matches": [
         "https://*/*",
@@ -47,7 +40,7 @@
   
     "web_accessible_resources": [
       {
-        "resources": ["data.txt"],
+        "resources": ["icon48.png"],
         "matches": ["<all_urls>"]
       }
     ]

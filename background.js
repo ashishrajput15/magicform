@@ -1,6 +1,3 @@
-console.log("[magicform] executing background.js")
-
-
 chrome.action.onClicked.addListener((tab) => {
   chrome.tabs.create({ url: 'options.html' });
 });
@@ -36,5 +33,3 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-
-console.log("[magicform] background.js executed")
