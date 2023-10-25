@@ -18,13 +18,11 @@
     "tabs",
     "scripting",
     "activeTab",
-    "storage",
-    "https://api.openai.com/"
+    "storage"
   ],
   "host_permissions": [
     "https://*/*",
-    "http://*/*",
-    "https://api.openai.com/"
+    "http://*/*"
   ],
   "content_scripts": [
     

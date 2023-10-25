@@ -8,7 +8,10 @@ function addMagicButton() {
   const forms = document.querySelectorAll('form');
   forms.forEach((form, index) => {
     const inputFields = form.querySelectorAll('input');
-    if (inputFields.length >= 3) {
+    const isSearchForm = form.querySelector('input[type="search"], [aria-label*="Search"], [placeholder*="Search"], [class*="search"], button[aria-label*="Search"], button[class*="search"]');
+    const isSpecialForm = form.querySelector('[data-hydro-click], [data-ga-click], button[data-view-component]');
+    
+    if (inputFields.length >= 2 && !isSearchForm && !isSpecialForm) {
       const submitButton = form.querySelector('[type="submit"]');
       if (submitButton) {
         const magicButton = document.createElement('button');
@@ -58,38 +61,54 @@ async function fillForm(form) {
     homePageContent={};
     currentPageContent={};
     if(enableHomePageScraping){
-    homePageContent = webdata(baseUrl,homePageWordCount);
+      console.log('enable HomePage:',enableHomePageScraping);
+    homePageContent = await webdata(baseUrl,homePageWordCount);
     }
     if(enableCurrentPageScraping){
-    currentPageContent = webdata(window.location.href,currentPageWordCount);
+    console.log('enable current:',enableCurrentPageScraping);
+    currentPageContent = await webdata(window.location.href,currentPageWordCount);
     }
-    content=`${homePageContent} ${currentPageContent}`;
+    if(homePageContent || currentPageContent){
+
+      content=`Personalize the answer based on the content of the website ${homePageContent} ${currentPageContent}`;
+    }
+    console.log(content);
      // Step 1: Collect form fields
      const formFields = {};
      const inputs = form.querySelectorAll("input, textarea, select");
 
+     let counter = 0;
 
      for (const input of inputs) {
-      if (input.name.toLowerCase().includes("name") || 
+       if (counter >= 8) break;
+      
+  const label = form.querySelector(`label[for="${input.id}"]`);
+  const labelText = label ? label.textContent.toLowerCase() : '';
+
+  if (input.name.toLowerCase().includes("name") || 
       input.placeholder.toLowerCase().includes("name") || 
-      input.getAttribute('autocomplete') === 'name') {
+      input.getAttribute('autocomplete') === 'name' ||
+      labelText.includes("name")) {
     input.value = name;
   }
   else if (input.name.toLowerCase().includes("email") || 
            input.placeholder.toLowerCase().includes("email") || 
-           input.getAttribute('autocomplete') === 'email') {
+           input.getAttribute('autocomplete') === 'email' ||
+           labelText.includes("email")) {
     input.value = email;
   }
   else if (input.name.toLowerCase().includes("phone") || 
            input.placeholder.toLowerCase().includes("phone") || 
-           input.getAttribute('autocomplete') === 'tel') {
+           input.getAttribute('autocomplete') === 'tel' ||
+           labelText.includes("phone")) {
     input.value = phone;
   }
-  
+
        else {
         if (input.type !== 'submit' && input.type !== 'hidden' && !input.disabled) {
-          const questionText = await fetchGPT(apiKey, `Simplify this html code to a simple question. ${input.outerHTML}`);
-          const promptText =`I am filling a form on ${baseUrl}. Help me answer this question '''${questionText}''' The answer should be based on following direction by user '''${prompt}'''`
+          const questionText = await fetchGPT(apiKey, `Answer this in minimum number of words. What is being asked in this html code of a form ${input.outerHTML}`);
+          console.log(`Form outerHTML ${input.outerHTML}`);
+          const promptText =`I am filling a form on ${baseUrl}. Help me answer this question '''${questionText}''' The answer should be based on following direction by user '''${prompt}''' ${content}`
           console.log(promptText);
           const answerText = await fetchGPT(apiKey, promptText);
       
@@ -107,7 +126,8 @@ async function fillForm(form) {
           input.value = trimmedAnswerText;
         }
       }
-      
+      counter++;
+      console.log(counter);
     }
     resolve();  
   });
